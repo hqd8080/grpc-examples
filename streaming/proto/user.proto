@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package services;
+
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+
+// 用户登录请求
+message UserLoginRequest {
+  string user_name =  1;      // 用户名
+  string user_pwd  =  2;      // 用户密码
+}
+
+// 用户登录响应
+message UserLoginResponse {
+  int64  user_id        = 1;       // 用户编号
+  string user_name      = 2;       // 用户名
+  string user_nickname  = 3;       // 用户昵称
+  string user_country   = 4;       // 用户国籍
+  int32  user_gender    = 5;       // 用户性别
+  double user_credits   = 6;       // 用户积分
+  bool   is_admin       = 7;       // 是否是管理员
+  bytes  auth_code      = 8;       // 授权码
+  float  user_balance   = 9;       // 用户余额
+
+  // 用户爱好
+  enum Hobby {
+    music      = 0;  // 音乐
+    basketball = 1;  // 篮球
+    tour       = 2;  // 旅游
+  }
+
+  Hobby user_hobby      = 10;      // 用户爱好
+
+  // 手机类型枚举
+  enum PhoneType {
+    mobile = 0;   // 移动
+    home   = 1;   // 家庭
+    work   = 2;   // 办公室
+  }
+
+  // 手机号码类型
+  message PhoneNumber {
+    string number   = 1;   // 手机号码
+    PhoneType type  = 2;   // 手机号码类型
+
+  }
+
+  repeated PhoneNumber phones       = 11;             // 手机号码
+  LoginStatus login_status          = 12;             // 登录状态
+  google.protobuf.Timestamp last_update_date = 17;    // 最后更新日期
+}
+
+service UserService {
+  rpc Login(UserLoginRequest)  returns  (UserLoginResponse);                        // 普通调用
+  rpc LoginClientStreaming(stream UserLoginRequest)  returns  (UserLoginResponse);  // 请求使用单向流
+  rpc LoginServerStreaming(UserLoginRequest)  returns  (stream UserLoginResponse);  // 响应使用单向流
+  rpc LoginStreaming(stream UserLoginRequest)  returns  (stream UserLoginResponse); // 双向流
+}
